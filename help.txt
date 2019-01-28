@@ -1,0 +1,1 @@
+{"Help": ["Commands": ["Help", "Who", "Role", "Roles", "Guilds"]]}
