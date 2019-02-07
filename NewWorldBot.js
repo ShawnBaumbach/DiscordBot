@@ -14,46 +14,60 @@ client.on('message', message  => {
     //var chan = "work-orders"
     //if (message.channel.name == chan && message.pinned == false)
      //   message.delete(60000*5);
-    if (message.author.bot)
+    //if (message.author.bot)
     //    message.delete(60000);
-        console.log(message.type.toString())
+        //console.log(message.type.toString())
+
+    if (message.content === "bad bot")
+        message.reply(`Just doing my job. :angry: `);
+        
     if (message.content.substring(0, 1) == '!') {
         var args = message.content.substring(1).split(' ');
         var cmd = args[0];
+        args.shift();
+        var cmdparameter = args.join(" ");
 
         switch(cmd.toUpperCase()) {
             case 'ROLE': 
-                if (args[1] != null){
-                    var uRole = getRoleID(args[1]);
-                    if (bBots.BlockRoles.includes(args[1].toUpperCase())){
-                        message.reply(`you do not have access to the role "${args[1]}"`);
+                if (cmdparameter != null){
+                    var uRole = getRoleID(cmdparameter);
+                    if (bBots.Roles.includes(cmdparameter.toUpperCase()) == false){
+                        message.reply(`you do not have access to the role "${cmdparameter}"`);
                         break;
                     }
                     if (uRole == null){
-                        message.reply(`there is no role called "${args[1]}". Type !roles to view a list of possible roles.`);
+                        message.reply(`there is no role called "${cmdparameter}". Type !roles to view a list of possible roles.`);
                     } else {
                         guildMember = message.member;
                         guildMember.addRole(uRole);  
-                        message.reply(`you have been assigned the role "${args[1]}"`);   
+                        message.reply(`you have been assigned the role "${cmdparameter}"`);   
                 }}
                 break;
 
             case 'REROLL': 
-                if (args[1] != null){
-                    var uRole = getRoleID(args[1]);
-
+                if (cmdparameter != null){
+                    
+                    var uRole = getRoleID(cmdparameter);
+                    
                     if (uRole == null){
-                        message.reply(`there is no role called "${args[1]}". Type !roles to view a list of possible roles.`);
+                        message.reply(`there is no role called "${cmdparameter}". Type !roles to view a list of possible roles.`);
                     } 
                     else if (message.member.roles.has(uRole) == false){
-                        message.reply(`you do not have the role "${args[1]}"`);
+                        message.reply(`you do not have the role "${cmdparameter}"`);
                         break;
                     }
                     else {
-                        guildMember = message.member;
-                        guildMember.removeRole(uRole);  
-                        message.reply(`you no longer have the role "${args[1]}"`);      
-                    }}
+                        try{
+                            guildMember = message.member;
+                            guildMember.removeRole(uRole); 
+                            message.reply(`you no longer have the role "${cmdparameter}"`);  
+                        }
+                        catch (error){
+                            console.log("Failed to remove role");
+                            message.reply(`I failed to remove the role "${cmdparameter}"`); 
+                        }
+                    }
+                }
                 break;
 
             case 'GUILDS':
@@ -62,27 +76,27 @@ client.on('message', message  => {
                 break;
 
             case 'HELP':
-                if (args[1] == null)
+                if (cmdparameter == null)
                     message.reply("If you can't help yourself, then how could I?");
                 break;
 
             case 'WHO':
-                var uRole = getRoleID(args[1]);
-                if (uRole != null && args[1] != null){
+                var uRole = getRoleID(cmdparameter);
+                if (uRole != null && cmdparameter != null){
                     const ListEmbed = new Discord.RichEmbed()
                         .setColor(message.guild.roles.get(uRole).color)
-                        .setTitle(`${args[1][0].toUpperCase() + args[1].substring(1).toLowerCase()}:`)
+                        .setTitle(`${cmdparameter[0].toUpperCase() + cmdparameter.substring(1).toLowerCase()}:`)
                         .addField("Skill sheet", 'You can view the google skill sheet [here](https://docs.google.com/spreadsheets/d/1V_t_XanpetCSBKaQb3qbKtEd3Hrfqo7LRWA3L--HwYM).')
                         .setFooter(`requested by ${message.member.displayName}.`)
                         .setDescription(message.guild.roles.get(uRole).members.map(m=>m.displayName).join('\n'));
                     message.channel.send(ListEmbed);
                 } else
-                    message.reply(`the role "${args[1]}" does not exist`);       
+                    message.reply(`the role "${cmdparameter}" does not exist`);       
                 break;
 
             case 'ROLES':
                 message.channel.send(message.guild.roles.filter(g => g.name != "@everyone" 
-                && bBots.BlockRoles.includes(g.name.toUpperCase()) == false).map(g => g.name).join("\n"));
+                && bBots.Roles.includes(g.name.toUpperCase()) == true).map(g => g.name).join("\n"));
                 break;
             }
         }
@@ -99,5 +113,6 @@ client.on('message', message  => {
 });
 
 client.on('error', console.error);
+client.on("reconnecting", () => console.log("Attempting to reconnect..."))
 
 client.login(auth.token);
