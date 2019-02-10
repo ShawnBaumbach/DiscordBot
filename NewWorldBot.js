@@ -20,7 +20,7 @@ client.on('message', message  => {
 
     if (message.content === "bad bot")
         message.reply(`Just doing my job. :angry: `);
-        
+
     if (message.content.substring(0, 1) == '!') {
         var args = message.content.substring(1).split(' ');
         var cmd = args[0];
@@ -28,7 +28,8 @@ client.on('message', message  => {
         var cmdparameter = args.join(" ");
 
         switch(cmd.toUpperCase()) {
-            case 'ROLE': 
+            case 'ROLL': 
+            case 'ROLE':
                 if (cmdparameter != null){
                     var uRole = getRoleID(cmdparameter);
                     if (bBots.Roles.includes(cmdparameter.toUpperCase()) == false){
